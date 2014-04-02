@@ -1,21 +1,11 @@
 package com.example.tripper;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-
-
-
 import java.net.URLConnection;
-
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
+import fi.foyt.foursquare.api.FoursquareApi;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -27,7 +17,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
-import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnCommunicateWithMainActivity, LocationListener{
 
@@ -36,6 +25,7 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 	private InputScreen inputscreen;
 	private LocationManager locationManager;
 	private String provider;
+	FoursquareApi foursquareApi;
 
 	float lat;
 	float lng;
@@ -48,6 +38,7 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		foursquareApi = new FoursquareApi("T5PPRZTOW4IHLNU20F20UTZHNR13KSGW53FPP0IVW5MLELKI", "XFKUY021ADWBG1DZQAMGTZTJXH5IWLVZ1SORHLGEHMBMAWWD", "https://github.com/cjmenzel/4tripper");
 
 		inputscreen = new InputScreen();
 		LocationManager service = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -86,12 +77,10 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 
 	@Override
 	public void onGoButtonPressed(String address) {
-		//TODO Send this address to google maps
 		mapsURL = null;
 		try {
 			mapsURL = new URL(formatAddress(address));
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		new OnNetwork().execute(mapsURL);
@@ -135,7 +124,7 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 
 	private class OnNetwork extends AsyncTask<URL, Void, String> {
 
-		protected void onPostExecute(Bitmap result) {
+		protected void onPostExecute(String result) {
 
 		}
 
