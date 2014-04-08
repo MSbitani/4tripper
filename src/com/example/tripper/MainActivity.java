@@ -1,22 +1,14 @@
 package com.example.tripper;
 
 import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Map;
-
-import com.json.parsers.JSONParser;
-import com.json.parsers.JsonParserFactory;
 
 import fi.foyt.foursquare.api.FoursquareApi;
 import fi.foyt.foursquare.api.FoursquareApiException;
 import fi.foyt.foursquare.api.Result;
-import fi.foyt.foursquare.api.entities.CompactVenue;
 import fi.foyt.foursquare.api.entities.VenuesSearchResult;
 import android.location.Criteria;
 import android.location.Location;
@@ -26,20 +18,25 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.util.JsonReader;
 import android.view.Menu;
+import android.widget.ArrayAdapter;
 
 public class MainActivity extends Activity implements OnCommunicateWithMainActivity, LocationListener{
 
 	public final static String FRAG1_TAG = "FRAG1";
+	public final static String FRAG2_TAG = "FRAG2";
 
 	private InputScreen inputscreen;
+	private ResultsScreen resultsscreen;
 	private LocationManager locationManager;
 	private String provider;
 	FoursquareApi foursquareApi;
 	String latlong;
+	Result<VenuesSearchResult> result;
 
 	float lat;
 	float lng;
@@ -143,13 +140,30 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 
 		protected void onPostExecute(String result) {
 
-			System.out.println("in onpost execute");
+			System.out.println("in onpostexecute");
+			//THIS IS WHERE I WOULD PARSE A JSON
 			//			JsonParserFactory factory = JsonParserFactory.getInstance();
 			//			JSONParser parser = factory.newJsonParser();
 			//			@SuppressWarnings("unchecked")
 			//			Map<String, String> jsonData = parser.parseJson(result);
 			//			String value = (String) jsonData.get("routes");
 			//			System.out.println(value);
+
+
+			FragmentManager fragMgr = getFragmentManager();
+			FragmentTransaction xact = fragMgr.beginTransaction();
+
+			if (fragMgr.findFragmentByTag(FRAG2_TAG) == null) {
+				xact.remove(inputscreen);
+				resultsscreen = new ResultsScreen();
+				fragMgr.executePendingTransactions();
+
+				xact = fragMgr.beginTransaction();
+
+				xact.replace(R.id.fragment1, resultsscreen, FRAG2_TAG);
+			}
+			xact.addToBackStack(null);
+			xact.commit();
 		}
 
 		protected String doInBackground(URL... params) {
@@ -157,16 +171,9 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 			URL url = params[0];
 			String json = "";
 			try {
-				Result<VenuesSearchResult> result = foursquareApi.venuesSearch(latlong, null, null, null, null, null, null, null, null, null, null);
-				if (result.getMeta().getCode() == 200) {
-					System.out.println("result success");
-					for (CompactVenue venue : result.getResult().getVenues()) {
-						// TODO: Do something we the data
-						System.out.println(venue.getName());
-					}
-				}
+				//FOURSQUARE STUFF
+				result = foursquareApi.venuesSearch(latlong, null, null, null, null, null, null, null, null, null, null);
 			} catch (FoursquareApiException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
@@ -189,4 +196,18 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 		}
 	}
 
+	public ArrayAdapter<String> getVenueResults() {
+		if (result.getMeta().getCode() == 200) {
+			String[] str = new String[result.getResult().getVenues().length];
+			for (int i = 0; i < result.getResult().getVenues().length; i++){
+				str[i] = result.getResult().getVenues()[i].getName();
+			}
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+					android.R.layout.simple_list_item_1, str);
+
+			return adapter;
+		} else {
+			return null;
+		}
+	}
 }
