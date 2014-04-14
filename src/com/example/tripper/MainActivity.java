@@ -9,6 +9,7 @@ import java.net.URLConnection;
 import fi.foyt.foursquare.api.FoursquareApi;
 import fi.foyt.foursquare.api.FoursquareApiException;
 import fi.foyt.foursquare.api.Result;
+import fi.foyt.foursquare.api.entities.CompactVenue;
 import fi.foyt.foursquare.api.entities.VenuesSearchResult;
 import android.location.Criteria;
 import android.location.Location;
@@ -209,5 +210,9 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 		} else {
 			return null;
 		}
+	}
+	
+	public CompactVenue[] getVenues() {
+		return result.getResult().getVenues();
 	}
 }
