@@ -125,7 +125,7 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 	private class OnNetwork extends AsyncTask<URL, Void, String> {
 
 		protected void onPostExecute(String result) {
-
+			super.onPostExecute(result);
 		}
 
 		protected String doInBackground(URL... params) {
