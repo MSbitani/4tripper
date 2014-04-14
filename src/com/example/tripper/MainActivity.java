@@ -1,11 +1,23 @@
 package com.example.tripper;
 
 import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Map;
+
+import com.json.parsers.JSONParser;
+import com.json.parsers.JsonParserFactory;
+
 import fi.foyt.foursquare.api.FoursquareApi;
+import fi.foyt.foursquare.api.FoursquareApiException;
+import fi.foyt.foursquare.api.Result;
+import fi.foyt.foursquare.api.entities.CompactVenue;
+import fi.foyt.foursquare.api.entities.VenuesSearchResult;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -16,6 +28,7 @@ import android.provider.Settings;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.JsonReader;
 import android.view.Menu;
 
 public class MainActivity extends Activity implements OnCommunicateWithMainActivity, LocationListener{
@@ -26,6 +39,7 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 	private LocationManager locationManager;
 	private String provider;
 	FoursquareApi foursquareApi;
+	String latlong;
 
 	float lat;
 	float lng;
@@ -95,6 +109,9 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 		System.out.println(lat);
 		System.out.println(lng);
 
+		latlong = Float.toString(lat) + "," + Float.toString(lng);
+		System.out.println(latlong);
+
 		return "https://maps.googleapis.com/maps/api/directions/json?origin="+lat+","+lng+"&destination="+newAddress+"&sensor=true&key=AIzaSyAF6wW8hogpzGNl_3qr1VNbMNl3OiT1yJg";
 	}
 
@@ -126,12 +143,32 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 
 		protected void onPostExecute(String result) {
 
+			System.out.println("in onpost execute");
+			//			JsonParserFactory factory = JsonParserFactory.getInstance();
+			//			JSONParser parser = factory.newJsonParser();
+			//			@SuppressWarnings("unchecked")
+			//			Map<String, String> jsonData = parser.parseJson(result);
+			//			String value = (String) jsonData.get("routes");
+			//			System.out.println(value);
 		}
 
 		protected String doInBackground(URL... params) {
 
 			URL url = params[0];
-			String json = null;
+			String json = "";
+			try {
+				Result<VenuesSearchResult> result = foursquareApi.venuesSearch(latlong, null, null, null, null, null, null, null, null, null, null);
+				if (result.getMeta().getCode() == 200) {
+					System.out.println("result success");
+					for (CompactVenue venue : result.getResult().getVenues()) {
+						// TODO: Do something we the data
+						System.out.println(venue.getName());
+					}
+				}
+			} catch (FoursquareApiException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			try {
 
 				URLConnection uc = url.openConnection();
@@ -139,14 +176,15 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 						new InputStreamReader(
 								uc.getInputStream()));
 				String inputLine;
-
-				while ((inputLine = in.readLine()) != null) 
-					System.out.println(inputLine);
+				while ((inputLine = in.readLine()) != null) {
+					json = json.concat(inputLine);
+				}
 				in.close();
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			System.out.println(json);
 			return json;
 		}
 	}
