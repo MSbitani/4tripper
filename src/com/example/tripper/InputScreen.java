@@ -33,7 +33,7 @@ public class InputScreen extends Fragment implements OnCommunicateWithInputScree
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.inputlayout, container,
+		View view = inflater.inflate(R.layout.input_layout, container,
 				false);
 
 		address = (EditText)view.findViewById(R.id.editText1);

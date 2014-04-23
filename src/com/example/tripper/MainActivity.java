@@ -25,7 +25,8 @@ import android.content.Intent;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 
-public class MainActivity extends Activity implements OnCommunicateWithMainActivity, LocationListener{
+public class MainActivity extends Activity implements
+		OnCommunicateWithMainActivity, LocationListener {
 
 	public final static String FRAG1_TAG = "FRAG1";
 	public final static String FRAG2_TAG = "FRAG2";
@@ -49,7 +50,10 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		foursquareApi = new FoursquareApi("T5PPRZTOW4IHLNU20F20UTZHNR13KSGW53FPP0IVW5MLELKI", "XFKUY021ADWBG1DZQAMGTZTJXH5IWLVZ1SORHLGEHMBMAWWD", "https://github.com/cjmenzel/4tripper");
+		foursquareApi = new FoursquareApi(
+				"T5PPRZTOW4IHLNU20F20UTZHNR13KSGW53FPP0IVW5MLELKI",
+				"XFKUY021ADWBG1DZQAMGTZTJXH5IWLVZ1SORHLGEHMBMAWWD",
+				"https://github.com/cjmenzel/4tripper");
 
 		inputscreen = new InputScreen();
 		LocationManager service = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -74,7 +78,7 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 		lng = (float) (location.getLongitude());
 
 		getFragmentManager().beginTransaction()
-		.add(R.id.fragment1, inputscreen, FRAG1_TAG).commit();
+				.add(R.id.fragment1, inputscreen, FRAG1_TAG).commit();
 
 		inputlistener = (OnCommunicateWithInputScreen) inputscreen;
 	}
@@ -109,7 +113,9 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 		latlong = Float.toString(lat) + "," + Float.toString(lng);
 		System.out.println(latlong);
 
-		return "https://maps.googleapis.com/maps/api/directions/json?origin="+lat+","+lng+"&destination="+newAddress+"&sensor=true&key=AIzaSyAF6wW8hogpzGNl_3qr1VNbMNl3OiT1yJg";
+		return "https://maps.googleapis.com/maps/api/directions/json?origin="
+				+ lat + "," + lng + "&destination=" + newAddress
+				+ "&sensor=true&key=AIzaSyAF6wW8hogpzGNl_3qr1VNbMNl3OiT1yJg";
 	}
 
 	@Override
@@ -141,14 +147,13 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 		protected void onPostExecute(String result) {
 
 			System.out.println("in onpostexecute");
-			//THIS IS WHERE I WOULD PARSE A JSON
-			//			JsonParserFactory factory = JsonParserFactory.getInstance();
-			//			JSONParser parser = factory.newJsonParser();
-			//			@SuppressWarnings("unchecked")
-			//			Map<String, String> jsonData = parser.parseJson(result);
-			//			String value = (String) jsonData.get("routes");
-			//			System.out.println(value);
-
+			// THIS IS WHERE I WOULD PARSE A JSON
+			// JsonParserFactory factory = JsonParserFactory.getInstance();
+			// JSONParser parser = factory.newJsonParser();
+			// @SuppressWarnings("unchecked")
+			// Map<String, String> jsonData = parser.parseJson(result);
+			// String value = (String) jsonData.get("routes");
+			// System.out.println(value);
 
 			FragmentManager fragMgr = getFragmentManager();
 			FragmentTransaction xact = fragMgr.beginTransaction();
@@ -171,17 +176,17 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 			URL url = params[0];
 			String json = "";
 			try {
-				//FOURSQUARE STUFF
-				result = foursquareApi.venuesSearch(latlong, null, null, null, null, null, null, null, null, null, null);
+				// FOURSQUARE STUFF
+				result = foursquareApi.venuesSearch(latlong, null, null, null,
+						null, null, null, null, null, null, null);
 			} catch (FoursquareApiException e) {
 				e.printStackTrace();
 			}
 			try {
 
 				URLConnection uc = url.openConnection();
-				BufferedReader in = new BufferedReader(
-						new InputStreamReader(
-								uc.getInputStream()));
+				BufferedReader in = new BufferedReader(new InputStreamReader(
+						uc.getInputStream()));
 				String inputLine;
 				while ((inputLine = in.readLine()) != null) {
 					json = json.concat(inputLine);
@@ -199,7 +204,7 @@ public class MainActivity extends Activity implements OnCommunicateWithMainActiv
 	public ArrayAdapter<String> getVenueResults() {
 		if (result.getMeta().getCode() == 200) {
 			String[] str = new String[result.getResult().getVenues().length];
-			for (int i = 0; i < result.getResult().getVenues().length; i++){
+			for (int i = 0; i < result.getResult().getVenues().length; i++) {
 				str[i] = result.getResult().getVenues()[i].getName();
 			}
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
