@@ -36,8 +36,8 @@ public class InputScreen extends Fragment implements OnCommunicateWithInputScree
 		View view = inflater.inflate(R.layout.input_layout, container,
 				false);
 
-		address = (EditText)view.findViewById(R.id.editText1);
-		gobutton = (Button)view.findViewById(R.id.button1);
+		address = (EditText)view.findViewById(R.id.destination);
+		gobutton = (Button)view.findViewById(R.id.submit);
 
 		gobutton.setOnClickListener(new OnClickListener(){
 
