@@ -229,7 +229,7 @@ containing a value of this type.
         public static final int distance=0x7f05000c;
         public static final int distancelabel=0x7f05000d;
         public static final int distancepicker=0x7f05000e;
-        public static final int fragment1=0x7f050005;
+        public static final int frame=0x7f050005;
         public static final int hybrid=0x7f050004;
         public static final int list=0x7f05000f;
         public static final int none=0x7f050000;
@@ -247,7 +247,7 @@ containing a value of this type.
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int input_layout=0x7f030001;
-        public static final int resultslayout=0x7f030002;
+        public static final int results_layout=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f0a0000;

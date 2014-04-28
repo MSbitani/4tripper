@@ -2,8 +2,9 @@ package com.example.tripper;
 
 import android.widget.ArrayAdapter;
 
-public interface OnCommunicateWithMainActivity {
+public interface OnMain {
 
-	public void onGoButtonPressed(String address);
+	public void onSubmitPressed(String address, int itime, int iradius);
+
 	public ArrayAdapter<String> getVenueResults();
 }

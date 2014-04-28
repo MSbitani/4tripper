@@ -6,17 +6,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 
-public class ResultsScreen extends Fragment implements OnCommunicateWithResultsScreen{
+public class ResultsScreen extends Fragment {
 
-	OnCommunicateWithMainActivity activityListener;
+	OnMain activityListener;
 
 	@Override
 	public void onCreate(Bundle state) {
@@ -27,19 +24,18 @@ public class ResultsScreen extends Fragment implements OnCommunicateWithResultsS
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 
-		activityListener = (MainActivity) activity;
+		activityListener = (OnMain) activity;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.resultslayout, container,
-				false);
+		View view = inflater.inflate(R.layout.results_layout, container, false);
 
 		ArrayAdapter<String> adapter = activityListener.getVenueResults();
 
-		ListView listView = (ListView)view.findViewById(R.id.list);
+		ListView listView = (ListView) view.findViewById(R.id.list);
 		// Assign adapter to ListView
 		listView.setAdapter(adapter);
 
@@ -49,7 +45,7 @@ public class ResultsScreen extends Fragment implements OnCommunicateWithResultsS
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				//Do something
+				// Do something
 			}
 
 		});

@@ -6,6 +6,6 @@
     <string name="destination">Enter Destination</string>
     <string name="submit">Submit</string>
     <string name="time">Time Until Stop (minutes)</string>
-    <string name="distance">Distance from route (miles)</string>
+    <string name="distance">Distance From Route (miles)</string>
 
 </resources>
