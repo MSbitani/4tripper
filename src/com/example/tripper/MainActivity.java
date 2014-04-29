@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +15,8 @@ import org.json.JSONTokener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.PolyUtil;
 
 import android.location.Location;
 import android.os.AsyncTask;
@@ -36,14 +39,15 @@ public class MainActivity extends Activity implements OnMain,
 	private int time;
 	private int radius;
 
+	private String key = "AIzaSyAF6wW8hogpzGNl_3qr1VNbMNl3OiT1yJg";
+	private JSONArray steps;
 	private LocationClient locationClient;
 	private Location location;
-	private String key = "AIzaSyAF6wW8hogpzGNl_3qr1VNbMNl3OiT1yJg";
 
 	private final String fsqAPI = "20140426";
 	private String clientID = "Y2N2JHAXEUORBDJZ3V31HJ5M03MQQO3FI1LTW2SK0QDWPXXN";
 	private String clientSecret = "1L2MNIVGMJ2U4ATAP3EHZQHCJHBVW0HMOWX2ND2OYQIHWPHV";
-	private JSONObject venues;
+	private JSONArray venues;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,58 +87,188 @@ public class MainActivity extends Activity implements OnMain,
 		time = itime;
 		radius = iradius;
 
-		String fsqURL = "https://api.foursquare.com/v2/venues/search?ll="
-				+ location.getLatitude() + "," + location.getLongitude()
-				+ "&intent=browse&radius=" + radius + "&v=" + fsqAPI
-				+ "&client_id=" + clientID + "&client_secret=" + clientSecret;
-
-		String mapURL = "https://maps.googleapis.com/maps/api/directions/json?origin="
-				+ location.getLatitude()
-				+ ","
-				+ location.getLongitude()
-				+ "&destination="
-				+ address.replace(' ', '+')
-				+ "&sensor=true&key=" + key;
-
-		URL fsqsURL = null;
-		URL mapsURL = null;
+		URL mapURL = null;
 
 		try {
-			fsqsURL = new URL(fsqURL);
-			mapsURL = new URL(mapURL);
+			mapURL = new URL(
+					"https://maps.googleapis.com/maps/api/directions/json?origin="
+							+ location.getLatitude() + ","
+							+ location.getLongitude() + "&destination="
+							+ address.replace(' ', '+') + "&sensor=true&key="
+							+ key);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		new OnNetwork().execute(fsqsURL, mapsURL);
+
+		new MapLink().execute(mapURL);
 
 	}
 
-	private class OnNetwork extends AsyncTask<URL, Void, JSONObject[]> {
+	private class MapLink extends AsyncTask<URL, Void, JSONObject> {
 
-		protected JSONObject[] doInBackground(URL... urls) {
+		protected JSONObject doInBackground(URL... urls) {
 
-			JSONObject[] json = new JSONObject[urls.length];
-			for (int i = 0; i < urls.length; i++)
+			JSONObject json = new JSONObject();
+			try {
+				URLConnection uc = urls[0].openConnection();
+				BufferedReader in = new BufferedReader(new InputStreamReader(
+						uc.getInputStream()));
+				String inputLine = "";
+				String nextLine = "";
+				while ((nextLine = in.readLine()) != null)
+					inputLine += nextLine;
+				json = (JSONObject) new JSONTokener(inputLine).nextValue();
+				in.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+
+			return json;
+		}
+
+		@SuppressWarnings("unchecked")
+		protected void onPostExecute(JSONObject result) {
+			try {
+				if (!result.getString("status").equals("OK"))
+					return;
+
+				steps = result.getJSONArray("routes").getJSONObject(0)
+						.getJSONArray("legs").getJSONObject(0)
+						.getJSONArray("steps");
+
+				int i, elapsed = 0;
+				for (i = 0; i < steps.length(); i++) {
+					elapsed += steps.getJSONObject(i).getJSONObject("duration")
+							.getInt("value");
+					if (elapsed >= time)
+						break;
+				}
+
+				List<LatLng> path = PolyUtil.decode(steps.getJSONObject(i)
+						.getJSONObject("polyline").getString("points"));
+
+				new SpotLink().execute(path);
+
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return;
+			}
+		}
+	}
+
+	private class SpotLink extends AsyncTask<List<LatLng>, Void, LatLng> {
+
+		protected LatLng doInBackground(List<LatLng>... paths) {
+			int begin = 0;
+			int end = paths[0].size() - 1;
+			int mid = -1;
+
+			URL mapURL = null;
+
+			while (begin < end) {
+				mid = ((end - begin) / 2) + begin;
 				try {
-					URLConnection uc = urls[i].openConnection();
+					mapURL = new URL(
+							"https://maps.googleapis.com/maps/api/directions/json?origin="
+									+ location.getLatitude() + ","
+									+ location.getLongitude() + "&destination="
+									+ paths[0].get(mid).latitude + ","
+									+ paths[0].get(mid).longitude
+									+ "&sensor=true&key=" + key);
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
+
+				JSONObject json = new JSONObject();
+				try {
+					URLConnection uc = mapURL.openConnection();
 					BufferedReader in = new BufferedReader(
 							new InputStreamReader(uc.getInputStream()));
 					String inputLine = "";
 					String nextLine = "";
 					while ((nextLine = in.readLine()) != null)
 						inputLine += nextLine;
-					json[i] = (JSONObject) new JSONTokener(inputLine)
-							.nextValue();
+					json = (JSONObject) new JSONTokener(inputLine).nextValue();
 					in.close();
 				} catch (Exception e) {
 					e.printStackTrace();
+					return null;
 				}
+
+				try {
+					if (!json.getString("status").equals("OK"))
+						return null;
+
+					int duration = json.getJSONArray("routes").getJSONObject(0)
+							.getJSONArray("legs").getJSONObject(0)
+							.getJSONObject("duration").getInt("value");
+
+					if (Math.abs(duration - time) <= 1)
+						break;
+					else if (duration > time)
+						end = mid;
+					else
+						begin = mid;
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			return paths[0].get(mid);
+		}
+
+		protected void onPostExecute(LatLng result) {
+
+			String url = "https://api.foursquare.com/v2/venues/search?ll="
+					+ result.latitude + "," + result.longitude
+					+ "&limit=50&intent=browse&radius=" + radius
+					+ "&client_id=" + clientID + "&client_secret="
+					+ clientSecret + "&v=" + fsqAPI;
+
+			URL fsqURL = null;
+
+			try {
+				fsqURL = new URL(url);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+
+			new FSQLink().execute(fsqURL);
+		}
+	}
+
+	private class FSQLink extends AsyncTask<URL, Void, JSONObject> {
+
+		protected JSONObject doInBackground(URL... urls) {
+
+			JSONObject json = new JSONObject();
+			try {
+				URLConnection uc = urls[0].openConnection();
+				BufferedReader in = new BufferedReader(new InputStreamReader(
+						uc.getInputStream()));
+				json = (JSONObject) new JSONTokener(in.readLine()).nextValue();
+				in.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
 
 			return json;
 		}
 
-		protected void onPostExecute(JSONObject[] results) {
-			venues = results[0];
+		protected void onPostExecute(JSONObject result) {
+			try {
+				if (result.getJSONObject("meta").getInt("code") != 200)
+					return;
+
+				venues = result.getJSONObject("response")
+						.getJSONArray("venues");
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return;
+			}
 
 			FragmentManager fragMgr = getFragmentManager();
 			FragmentTransaction xact = fragMgr.beginTransaction();
@@ -152,15 +286,9 @@ public class MainActivity extends Activity implements OnMain,
 		String[] results = new String[] { "No results found" };
 
 		try {
-			if (venues.getJSONObject("meta").getInt("code") == 200) {
-				JSONArray v = venues.getJSONObject("response").getJSONArray(
-						"venues");
-				results = new String[v.length()];
-				for (int i = 0; i < v.length(); i++)
-					results[i] = v.getJSONObject(i).getString("name");
-			} else {
-				results[0] = "Error searching";
-			}
+			results = new String[venues.length()];
+			for (int i = 0; i < venues.length(); i++)
+				results[i] = venues.getJSONObject(i).getString("name");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

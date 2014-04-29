@@ -63,7 +63,7 @@ public class InputScreen extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				String search = address.getText().toString();
-				int time = timepicker.getValue() * 5;
+				int time = timepicker.getValue() * 300;
 				int radius = (int) (distancepicker.getValue() * 1609.344);
 
 				if (!search.equals("")) {
