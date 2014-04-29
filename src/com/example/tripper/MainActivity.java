@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements OnMain,
 
 	private LocationClient locationClient;
 	private Location location;
+	private String key = "AIzaSyAF6wW8hogpzGNl_3qr1VNbMNl3OiT1yJg";
 
 	private final String fsqAPI = "20140426";
 	private String clientID = "Y2N2JHAXEUORBDJZ3V31HJ5M03MQQO3FI1LTW2SK0QDWPXXN";
@@ -93,7 +94,7 @@ public class MainActivity extends Activity implements OnMain,
 				+ location.getLongitude()
 				+ "&destination="
 				+ address.replace(' ', '+')
-				+ "&sensor=true&key=AIzaSyAF6wW8hogpzGNl_3qr1VNbMNl3OiT1yJg";
+				+ "&sensor=true&key=" + key;
 
 		URL fsqsURL = null;
 		URL mapsURL = null;
@@ -118,13 +119,17 @@ public class MainActivity extends Activity implements OnMain,
 					URLConnection uc = urls[i].openConnection();
 					BufferedReader in = new BufferedReader(
 							new InputStreamReader(uc.getInputStream()));
-					json[i] = (JSONObject) new JSONTokener(in.readLine())
+					String inputLine = "";
+					String nextLine = "";
+					while ((nextLine = in.readLine()) != null)
+						inputLine += nextLine;
+					json[i] = (JSONObject) new JSONTokener(inputLine)
 							.nextValue();
 					in.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			System.out.println(json);
+
 			return json;
 		}
 
