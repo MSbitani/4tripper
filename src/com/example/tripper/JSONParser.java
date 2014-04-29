@@ -8,10 +8,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.graphics.PointF;
+import com.google.android.gms.maps.model.LatLng;
 
-public class JSONParser
-{
+public class JSONParser {
 
 	/**
 	 * Takes BufferedReader object and returns resulting JSON object
@@ -22,9 +21,8 @@ public class JSONParser
 	 * @throws IOException
 	 * @throws JSONException
 	 */
-	public static JSONObject readerToJSONObject(BufferedReader br) throws IOException,
-			JSONException
-	{
+	public static JSONObject readerToJSONObject(BufferedReader br)
+			throws IOException, JSONException {
 		StringBuilder sb = new StringBuilder();
 		String inputLine;
 
@@ -48,10 +46,9 @@ public class JSONParser
 	 * @return ArrayList of PointF objects with y as latitude and x as longitude
 	 * @throws JSONException
 	 */
-	public static ArrayList<PointF> getGeoPointsInTimeRange(JSONObject json, int timeGiven,
-			int range) throws JSONException
-	{
-		ArrayList<PointF> geoTags = new ArrayList<PointF>();
+	public static ArrayList<LatLng> getGeoPointsInTimeRange(JSONObject json,
+			int timeGiven, int range) throws JSONException {
+		ArrayList<LatLng> geoTags = new ArrayList<LatLng>();
 
 		int MAX_SEC = (timeGiven + range) * 60;
 		int MIN_SEC = (timeGiven - range) * 60;
@@ -60,17 +57,14 @@ public class JSONParser
 		JSONObject routes = json.getJSONArray("routes").getJSONObject(0);
 		JSONObject legs = routes.getJSONArray("legs").getJSONObject(0);
 		JSONArray steps = legs.getJSONArray("steps");
-		for (int i = 0; i < steps.length(); i++)
-		{
+		for (int i = 0; i < steps.length(); i++) {
 			JSONObject curStep = steps.getJSONObject(i);
-			if (secTaken >= MIN_SEC)
-			{
+			if (secTaken >= MIN_SEC) {
 				JSONObject endLoc = curStep.getJSONObject("start_location");
-				PointF p = new PointF();
+				LatLng p = new LatLng(endLoc.getDouble("lat"),
+						endLoc.getDouble("lng"));
 				// converting double to float will lose precision and range...
 				// but not much else we can do
-				p.x = (float) endLoc.getDouble("lng");
-				p.y = (float) endLoc.getDouble("lat");
 				geoTags.add(p);
 			}
 			// adjust counter to see if in range

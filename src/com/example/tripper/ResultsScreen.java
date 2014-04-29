@@ -16,15 +16,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 
-public class ResultsScreen extends Fragment implements OnCommunicateWithResultsScreen{
+public class ResultsScreen extends Fragment {
 
 	OnCommunicateWithMainActivity activityListener;
 	MapView mapView;
@@ -39,7 +36,7 @@ public class ResultsScreen extends Fragment implements OnCommunicateWithResultsS
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 
-		activityListener = (MainActivity) activity;
+		activityListener = (OnMain) activity;
 	}
 
 	@Override
