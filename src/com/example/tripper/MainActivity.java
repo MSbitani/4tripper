@@ -302,6 +302,10 @@ public class MainActivity extends Activity implements OnMain,
 		// TODO Auto-generated method stub
 
 	}
+	
+	public CompactVenue[] getVenues() {
+		return result.getResult().getVenues();
+	}
 
 	@Override
 	public void onConnected(Bundle arg0) {
@@ -314,5 +318,4 @@ public class MainActivity extends Activity implements OnMain,
 		// TODO Auto-generated method stub
 
 	}
-
 }
