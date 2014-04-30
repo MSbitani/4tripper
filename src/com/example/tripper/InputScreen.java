@@ -2,12 +2,14 @@ package com.example.tripper;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -68,6 +70,10 @@ public class InputScreen extends Fragment {
 
 				if (!search.equals("")) {
 					blistener.onSubmitPressed(search, time, radius);
+					((InputMethodManager) getActivity().getSystemService(
+							Context.INPUT_METHOD_SERVICE))
+							.hideSoftInputFromWindow(address.getWindowToken(),
+									0);
 				}
 			}
 		});

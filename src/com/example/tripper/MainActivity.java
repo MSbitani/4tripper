@@ -43,6 +43,7 @@ public class MainActivity extends Activity implements OnMain,
 	private JSONArray steps;
 	private LocationClient locationClient;
 	private Location location;
+	private LatLng resultLocation;
 
 	private final String fsqAPI = "20140426";
 	private String clientID = "Y2N2JHAXEUORBDJZ3V31HJ5M03MQQO3FI1LTW2SK0QDWPXXN";
@@ -224,6 +225,8 @@ public class MainActivity extends Activity implements OnMain,
 
 		protected void onPostExecute(LatLng result) {
 
+			resultLocation = result;
+
 			String url = "https://api.foursquare.com/v2/venues/search?ll="
 					+ result.latitude + "," + result.longitude
 					+ "&limit=50&intent=browse&radius=" + radius
@@ -298,6 +301,14 @@ public class MainActivity extends Activity implements OnMain,
 
 		return new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, results);
+	}
+
+	public LatLng getResultLocation() {
+		return resultLocation;
+	}
+
+	public JSONArray getVenues() {
+		return venues;
 	}
 
 	@Override
