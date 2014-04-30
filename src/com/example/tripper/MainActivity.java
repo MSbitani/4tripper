@@ -145,6 +145,9 @@ public class MainActivity extends Activity implements OnMain,
 						break;
 				}
 
+				if (i == steps.length())
+					i--;
+
 				List<LatLng> path = PolyUtil.decode(steps.getJSONObject(i)
 						.getJSONObject("polyline").getString("points"));
 
@@ -162,7 +165,7 @@ public class MainActivity extends Activity implements OnMain,
 		protected LatLng doInBackground(List<LatLng>... paths) {
 			int begin = 0;
 			int end = paths[0].size() - 1;
-			int mid = -1;
+			int mid = ((end - begin) / 2);
 
 			URL mapURL = null;
 
@@ -204,7 +207,7 @@ public class MainActivity extends Activity implements OnMain,
 							.getJSONArray("legs").getJSONObject(0)
 							.getJSONObject("duration").getInt("value");
 
-					if (Math.abs(duration - time) <= 1)
+					if (Math.abs(end - begin) <= 1)
 						break;
 					else if (duration > time)
 						end = mid;
