@@ -72,7 +72,7 @@ public class ResultsScreen extends Fragment {
 		MapsInitializer.initialize(this.getActivity());
 		
 		//Zoom in on result location
-		CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(activityListener.getResultLocation(), 10);
+		CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(activityListener.getResultLocation(), 12);
 		map.animateCamera(cameraUpdate);
 
 		return view;
