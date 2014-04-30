@@ -24,6 +24,8 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.widget.ArrayAdapter;
 
 public class MainActivity extends Activity implements OnMain,
@@ -38,6 +40,8 @@ public class MainActivity extends Activity implements OnMain,
 
 	private int time;
 	private int radius;
+	
+	private ProgressDialog loadingDialog;
 
 	private String key = "AIzaSyAF6wW8hogpzGNl_3qr1VNbMNl3OiT1yJg";
 	private JSONArray steps;
@@ -101,12 +105,16 @@ public class MainActivity extends Activity implements OnMain,
 			e.printStackTrace();
 		}
 
-		new MapLink().execute(mapURL);
+		new MapLink(this).execute(mapURL);
 
 	}
 
 	private class MapLink extends AsyncTask<URL, Void, JSONObject> {
-
+		
+		public MapLink(Context c) {
+			loadingDialog = ProgressDialog.show(c, "Loading...", "We're calculating your anticipated location!");
+		}
+		
 		protected JSONObject doInBackground(URL... urls) {
 
 			JSONObject json = new JSONObject();
@@ -162,7 +170,7 @@ public class MainActivity extends Activity implements OnMain,
 	}
 
 	private class SpotLink extends AsyncTask<List<LatLng>, Void, LatLng> {
-
+		
 		protected LatLng doInBackground(List<LatLng>... paths) {
 			int begin = 0;
 			int end = paths[0].size() - 1;
@@ -275,6 +283,8 @@ public class MainActivity extends Activity implements OnMain,
 				e.printStackTrace();
 				return;
 			}
+			
+			loadingDialog.hide();
 
 			FragmentManager fragMgr = getFragmentManager();
 			FragmentTransaction xact = fragMgr.beginTransaction();
