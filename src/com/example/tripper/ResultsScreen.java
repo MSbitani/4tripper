@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -22,7 +23,10 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +71,16 @@ public class ResultsScreen extends Fragment {
 		cm.setRenderer(new ClusterRenderer(getActivity(), map, cm));
 		map.setOnCameraChangeListener(cm);
 		map.setOnMarkerClickListener(cm);
+		
+		map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+			@Override
+			public void onInfoWindowClick(Marker m) {
+				LatLng l = m.getPosition();
+				String geoString = String.format("http://maps.google.com/maps?daddr=%s,%s", l.latitude, l.longitude);
+				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(geoString));
+				startActivity(intent);
+			}
+		});
 
 		MapsInitializer.initialize(this.getActivity());
 
