@@ -89,6 +89,7 @@ public class ResultsScreen extends Fragment {
 
 				cm.addItem(new Venue(new MarkerOptions()
 						.title(venue.getString("name"))
+						.snippet(category)
 						.position(position)
 						.icon(BitmapDescriptorFactory.defaultMarker(colors
 								.get(category)))));
@@ -153,6 +154,7 @@ public class ResultsScreen extends Fragment {
 
 			MarkerOptions options = item.getOptions();
 			marker.setTitle(options.getTitle());
+			marker.setSnippet(options.getSnippet());
 			marker.setIcon(options.getIcon());
 		}
 	}
