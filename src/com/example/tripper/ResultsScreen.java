@@ -1,7 +1,6 @@
 package com.example.tripper;
 
-import java.util.HashMap;
-
+import java.io.File;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -90,28 +90,27 @@ public class ResultsScreen extends Fragment {
 
 		bounds = new LatLngBounds.Builder();
 
-		HashMap<String, Float> colors = new HashMap<String, Float>();
-
 		for (int i = 0; i < venues.length(); i++) {
 			try {
 				JSONObject venue = venues.getJSONObject(i);
 				String category = venue.getJSONArray("categories")
 						.getJSONObject(0).getString("name");
 
-				if (!colors.containsKey(category))
-					colors.put(category, (float) (Math.random() * 360));
-
 				LatLng position = new LatLng(venue.getJSONObject("location")
 						.getDouble("lat"), venue.getJSONObject("location")
 						.getDouble("lng"));
 				bounds.include(position);
 
+				File file = new File(getActivity().getCacheDir(), venue
+						.getJSONArray("categories").getJSONObject(0)
+						.getString("id")
+						+ ".png");
+				BitmapDescriptor image = BitmapDescriptorFactory.fromPath(file
+						.getAbsolutePath());
+
 				cm.addItem(new Venue(new MarkerOptions()
-						.title(venue.getString("name"))
-						.snippet(category)
-						.position(position)
-						.icon(BitmapDescriptorFactory.defaultMarker(colors
-								.get(category)))));
+						.title(venue.getString("name")).snippet(category)
+						.position(position).icon(image)));
 
 			} catch (JSONException e) {
 				e.printStackTrace();

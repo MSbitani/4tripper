@@ -1,6 +1,10 @@
 package com.example.tripper;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,6 +30,9 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.widget.ArrayAdapter;
 
 public class MainActivity extends Activity implements OnMain,
@@ -290,6 +297,51 @@ public class MainActivity extends Activity implements OnMain,
 				return;
 			}
 
+			new FSQILink().execute();
+		}
+	}
+
+	private class FSQILink extends AsyncTask<Void, Void, Void> {
+
+		protected Void doInBackground(Void... voids) {
+
+			for (int i = 0; i < venues.length(); i++)
+				try {
+					JSONObject category = venues.getJSONObject(i)
+							.getJSONArray("categories").getJSONObject(0);
+					File file = new File(getCacheDir(),
+							category.getString("id") + ".png");
+					if (!file.exists()) {
+						JSONObject icon = category.getJSONObject("icon");
+						String url = icon.getString("prefix") + "bg_64"
+								+ icon.getString("suffix");
+
+						URL fsqIURL = null;
+						try {
+							fsqIURL = new URL(url);
+						} catch (MalformedURLException e) {
+							e.printStackTrace();
+						}
+
+						URLConnection uc = fsqIURL.openConnection();
+						InputStream is = uc.getInputStream();
+						Bitmap image = BitmapFactory.decodeStream(is);
+						is.close();
+
+						file.createNewFile();
+						BufferedOutputStream stream = new BufferedOutputStream(
+								new FileOutputStream(file));
+						image.compress(CompressFormat.PNG, 100, stream);
+						stream.close();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			return null;
+		}
+
+		protected void onPostExecute(Void result) {
 			loadingDialog.hide();
 
 			FragmentManager fragMgr = getFragmentManager();
