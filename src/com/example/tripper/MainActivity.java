@@ -61,17 +61,18 @@ public class MainActivity extends Activity implements OnMain,
 
 		locationClient = new LocationClient(this, this, this);
 
-		if (getFragmentManager().findFragmentByTag(FRAG1_TAG) == null) {
-			inputscreen = new InputScreen();
-			getFragmentManager().beginTransaction()
-					.add(R.id.frame, inputscreen, FRAG1_TAG).commit();
-		}
-
 		if (savedInstanceState != null) {
 			inputscreen = (InputScreen) getFragmentManager().findFragmentByTag(
 					FRAG1_TAG);
 			resultsscreen = (ResultsScreen) getFragmentManager()
 					.findFragmentByTag(FRAG2_TAG);
+
+		} else {
+			if (getFragmentManager().findFragmentByTag(FRAG1_TAG) == null) {
+				inputscreen = new InputScreen();
+				getFragmentManager().beginTransaction()
+						.add(R.id.frame, inputscreen, FRAG1_TAG).commit();
+			}
 		}
 	}
 
@@ -112,8 +113,8 @@ public class MainActivity extends Activity implements OnMain,
 	private class MapLink extends AsyncTask<URL, Void, JSONObject> {
 
 		public MapLink(Context c) {
-			loadingDialog = ProgressDialog.show(c, "Loading...",
-					"We're calculating your anticipated location!");
+			loadingDialog = ProgressDialog.show(c, "Please wait",
+					"Calculating anticipated location");
 		}
 
 		protected JSONObject doInBackground(URL... urls) {

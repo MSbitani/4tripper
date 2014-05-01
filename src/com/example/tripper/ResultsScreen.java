@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,11 +35,16 @@ public class ResultsScreen extends Fragment {
 	private OnMain activityListener;
 	private MapView mapView;
 	private GoogleMap map;
+	private LatLngBounds.Builder bounds;
 	private ClusterManager<Venue> cm;
+	private JSONArray venues;
 
 	@Override
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
+		setRetainInstance(true);
+
+		venues = activityListener.getVenues();
 	}
 
 	@Override
@@ -56,8 +60,6 @@ public class ResultsScreen extends Fragment {
 
 		View view = inflater.inflate(R.layout.map, container, false);
 
-		JSONArray venues = activityListener.getVenues();
-
 		// Gets the MapView from the XML layout and creates it
 		mapView = (MapView) view.findViewById(R.id.mapview);
 		mapView.onCreate(savedInstanceState);
@@ -71,20 +73,25 @@ public class ResultsScreen extends Fragment {
 		cm.setRenderer(new ClusterRenderer(getActivity(), map, cm));
 		map.setOnCameraChangeListener(cm);
 		map.setOnMarkerClickListener(cm);
-		
+
 		map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 			@Override
 			public void onInfoWindowClick(Marker m) {
 				LatLng l = m.getPosition();
-				String geoString = String.format("http://maps.google.com/maps?daddr=%s,%s", l.latitude, l.longitude);
-				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(geoString));
+				String geoString = String.format(
+						"http://maps.google.com/maps?daddr=%s,%s", l.latitude,
+						l.longitude);
+				Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+						Uri.parse(geoString));
 				startActivity(intent);
 			}
 		});
 
 		MapsInitializer.initialize(this.getActivity());
 
-		LatLngBounds.Builder bounds = new LatLngBounds.Builder();
+		bounds = new LatLngBounds.Builder();
+
+		HashMap<String, Float> colors = new HashMap<String, Float>();
 
 		for (int i = 0; i < venues.length(); i++) {
 			try {
@@ -92,7 +99,6 @@ public class ResultsScreen extends Fragment {
 				String category = venue.getJSONArray("categories")
 						.getJSONObject(0).getString("name");
 
-				HashMap<String, Float> colors = new HashMap<String, Float>();
 				if (!colors.containsKey(category))
 					colors.put(category, (float) (Math.random() * 360));
 
@@ -114,16 +120,21 @@ public class ResultsScreen extends Fragment {
 		}
 
 		// Zoom in on result location
-		map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(),
-				container.getWidth(), container.getHeight(), 50));
+		map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+			@Override
+			public void onMapLoaded() {
+				map.animateCamera(CameraUpdateFactory.newLatLngBounds(
+						bounds.build(), 50));
+			}
+		});
 
 		return view;
 	}
 
 	@Override
 	public void onResume() {
-		mapView.onResume();
 		super.onResume();
+		mapView.onResume();
 	}
 
 	@Override

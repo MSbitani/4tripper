@@ -25,6 +25,12 @@ public class InputScreen extends Fragment {
 	OnMain blistener;
 
 	@Override
+	public void onCreate(Bundle state) {
+		super.onCreate(state);
+		setRetainInstance(true);
+	}
+
+	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 
