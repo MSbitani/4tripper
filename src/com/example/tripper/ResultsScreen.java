@@ -76,13 +76,12 @@ public class ResultsScreen extends Fragment {
 
 		map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 			@Override
-			public void onInfoWindowClick(Marker m) {
-				LatLng l = m.getPosition();
-				String geoString = String.format(
-						"http://maps.google.com/maps?daddr=%s,%s", l.latitude,
-						l.longitude);
+			public void onInfoWindowClick(Marker marker) {
+				LatLng loc = marker.getPosition();
 				Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-						Uri.parse(geoString));
+						Uri.parse(String.format(
+								"http://maps.google.com/maps?daddr=%s,%s",
+								loc.latitude, loc.longitude)));
 				startActivity(intent);
 			}
 		});
@@ -120,6 +119,8 @@ public class ResultsScreen extends Fragment {
 		}
 
 		// Zoom in on result location
+		map.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.build()
+				.getCenter(), 10));
 		map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
 			@Override
 			public void onMapLoaded() {
