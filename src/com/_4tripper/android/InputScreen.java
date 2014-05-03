@@ -1,4 +1,4 @@
-package com._4tripper;
+package com._4tripper.android;
 
 import android.app.Activity;
 import android.app.Fragment;
