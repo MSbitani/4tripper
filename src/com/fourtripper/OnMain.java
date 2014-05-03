@@ -1,4 +1,4 @@
-package com._4tripper.android;
+package com.fourtripper;
 
 import org.json.JSONArray;
 

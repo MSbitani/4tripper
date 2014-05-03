@@ -1,4 +1,4 @@
-package com._4tripper.android;
+package com.fourtripper;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
+import com.fourtripper.R;
 
 public class InputScreen extends Fragment {
 

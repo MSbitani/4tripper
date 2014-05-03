@@ -1,4 +1,4 @@
-package com._4tripper.android;
+package com.fourtripper;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -10,18 +10,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
+import com.fourtripper.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.PolyUtil;
-
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
