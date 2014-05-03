@@ -7,5 +7,6 @@
     <string name="submit">Submit</string>
     <string name="time">Time Until Stop (minutes)</string>
     <string name="distance">Distance From Route (miles)</string>
+    <string name="description">This app finds points of interest on your route while traveling</string>
 
 </resources>

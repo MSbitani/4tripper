@@ -1,6 +1,7 @@
-package com.example.tripper;
+package com._4tripper;
 
 import java.io.File;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
